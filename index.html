@@ -1,31 +1,2398 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Hệ thống tính toán và phân tích Bát Tự (Tử vi Trung Hoa) chính xác nhất Việt Nam. Khám phá vận mệnh, tính cách và tương lai với công nghệ AI tiên tiến." />
-    <meta name="keywords" content="bát tự, tử vi, phong thủy, vận mệnh, tính cách, AI, minh kính đài" />
-    <meta name="author" content="Minh Kính Đài" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://minhkinhdat.com/" />
-    <meta property="og:title" content="Minh Kính Đài - Hệ Thống Bát Tự AI Tiên Tiến" />
-    <meta property="og:description" content="Tính toán và phân tích Bát Tự chính xác với công nghệ AI. Khám phá vận mệnh, tính cách và tương lai của bạn." />
-    <meta property="og:image" content="/og-image.jpg" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Jump - Game Nhảy Vô Tận</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://minhkinhdat.com/" />
-    <meta property="twitter:title" content="Minh Kính Đài - Hệ Thống Bát Tự AI Tiên Tiến" />
-    <meta property="twitter:description" content="Tính toán và phân tích Bát Tự chính xác với công nghệ AI. Khám phá vận mệnh, tính cách và tương lai của bạn." />
-    <meta property="twitter:image" content="/og-image.jpg" />
-    
-    <title>Minh Kính Đài - Hệ Thống Bát Tự AI Tiên Tiến Nhất Việt Nam</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameCanvas {
+            border: 3px solid #fff;
+            border-radius: 10px;
+            background: #000;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+        }
+
+        .ui-element {
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid #FFD700;
+        }
+
+        .menu-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .menu-title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+        }
+
+        .menu-subtitle {
+            font-size: 18px;
+            color: #FFF;
+            margin-bottom: 40px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .menu-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 200px;
+            border: 3px solid #FFD700;
+            text-align: center;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .menu-button.character {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+        }
+
+        .menu-button.shop {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+        }
+
+        .menu-button.settings {
+            background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+        }
+
+        .notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,0,0,0.9);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 300;
+            display: none;
+        }
+
+        .level-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #FFD700;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .auth-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #FFD700;
+            display: none;
+            z-index: 400;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .character-panel, .shop-panel, .settings-panel, .account-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            z-index: 350;
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 36px;
+            color: #FFD700;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .character-grid, .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .character-item, .shop-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #555;
+            transition: all 0.3s;
+        }
+
+        .character-item.selected {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px #FFD700;
+        }
+
+        .character-item:hover, .shop-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .character-preview, .shop-item-preview {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .character-name, .shop-item-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .character-status, .shop-item-price {
+            font-size: 14px;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .character-button, .shop-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .character-button.locked {
+            background: linear-gradient(45deg, #9E9E9E, #757575);
+            cursor: not-allowed;
+        }
+
+        .settings-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .settings-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .back-button {
+            background: linear-gradient(45deg, #F44336, #D32F2F);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .level-complete {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 350;
+            border: 3px solid #FFD700;
+            display: none;
+        }
+
+        .level-complete-title {
+            font-size: 36px;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+
+        .level-complete-stats {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .level-complete-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .payment-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #FFD700;
+            display: none;
+            z-index: 450;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .payment-title {
+            font-size: 24px;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .payment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .payment-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .payment-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .account-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        .account-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .account-info-label {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .account-info-value {
+            color: white;
+        }
+
+        .account-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .game-ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .game-ui button {
+            pointer-events: auto;
+        }
+
+        .game-controls {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 50px;
+        }
+
+        .control-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: 2px solid #FFD700;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .jump-button {
+            width: 100px;
+            height: 100px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .auth-tab.active {
+            background: #FFD700;
+            color: black;
+        }
+
+        .auth-tab:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .auth-tab:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .auth-content {
+            display: none;
+        }
+
+        .auth-content.active {
+            display: block;
+        }
+
+        .payment-info-section {
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-title {
+                font-size: 36px;
+            }
+            
+            .menu-button {
+                font-size: 16px;
+                padding: 12px 25px;
+                min-width: 180px;
+            }
+            
+            .ui-element {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .character-grid, .shop-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- UI Overlay -->
+        <div class="ui-overlay">
+            <div class="ui-element" id="scoreDisplay">Điểm: 0</div>
+            <div class="ui-element" id="coinsDisplay">💰 0</div>
+            <div class="ui-element" id="livesDisplay">❤️ 3</div>
+        </div>
+
+        <!-- Level Indicator -->
+        <div class="level-indicator" id="levelDisplay">Level 1</div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Game UI -->
+        <div class="game-ui" id="gameUI" style="display: none;">
+            <div class="game-controls">
+                <button class="control-button" id="leftButton">◀</button>
+                <button class="control-button jump-button" id="jumpButton">▲</button>
+                <button class="control-button" id="rightButton">▶</button>
+            </div>
+        </div>
+
+        <!-- Menu Overlay -->
+        <div class="menu-overlay" id="menuOverlay">
+            <div class="menu-title">PIXEL JUMP</div>
+            <div class="menu-subtitle">
+                Nhảy cao nhất có thể!<br>
+                Tap để nhảy, double-tap để nhảy mạnh<br>
+                Tap trái/phải để di chuyển ngang
+            </div>
+            
+            <div id="authStatus" style="margin-bottom: 20px; font-size: 16px; color: #FFD700;"></div>
+            
+            <button class="menu-button" id="startButton">BẮT ĐẦU CHƠI</button>
+            <button class="menu-button character" id="characterButton">NHÂN VẬT</button>
+            <button class="menu-button shop" id="shopButton">CỬA HÀNG</button>
+            <button class="menu-button settings" id="settingsButton">CÀI ĐẶT</button>
+            <button class="menu-button" id="authButton">ĐĂNG NHẬP / ĐĂNG KÝ</button>
+        </div>
+
+        <!-- Auth Panel -->
+        <div class="auth-panel" id="authPanel">
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="loginTab">ĐĂNG NHẬP</button>
+                <button class="auth-tab" id="registerTab">ĐĂNG KÝ</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="auth-content active" id="loginContent">
+                <input type="email" class="auth-input" id="loginEmail" placeholder="Email">
+                <input type="password" class="auth-input" id="loginPassword" placeholder="Mật khẩu">
+                
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <button class="menu-button" id="loginButton" style="min-width: 120px; font-size: 16px;">ĐĂNG NHẬP</button>
+                    <button class="menu-button" id="cancelLoginButton" style="min-width: 120px; font-size: 16px;">HỦY</button>
+                </div>
+            </div>
+            
+            <!-- Register Form -->
+            <div class="auth-content" id="registerContent">
+                <input type="email" class="auth-input" id="registerEmail" placeholder="Email">
+                <input type="password" class="auth-input" id="registerPassword" placeholder="Mật khẩu">
+                <input type="text" class="auth-input" id="registerUsername" placeholder="Tên người dùng">
+                
+                <!-- Thông tin thanh toán -->
+                <div class="payment-info-section">
+                    <h4 style="color: #FFD700; margin-bottom: 10px; text-align: center;">Thông tin thanh toán</h4>
+                    <input type="text" class="auth-input" id="registerCardName" placeholder="Tên chủ thẻ">
+                    <input type="text" class="auth-input" id="registerCardNumber" placeholder="Số thẻ">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" class="auth-input" id="registerCardExpiry" placeholder="MM/YY" style="width: 50%;">
+                        <input type="text" class="auth-input" id="registerCardCVV" placeholder="CVV" style="width: 50%;">
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <button class="menu-button" id="registerButton" style="min-width: 120px; font-size: 16px;">ĐĂNG KÝ</button>
+                    <button class="menu-button" id="cancelRegisterButton" style="min-width: 120px; font-size: 16px;">HỦY</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Panel -->
+        <div class="account-panel" id="accountPanel">
+            <div class="panel-title">TÀI KHOẢN</div>
+            <div class="account-info" id="accountInfo">
+                <!-- Account info will be populated dynamically -->
+            </div>
+            <div class="account-buttons">
+                <button class="menu-button" id="purchaseHistoryButton">LỊCH SỬ MUA HÀNG</button>
+                <button class="menu-button" id="paymentInfoButton">THÔNG TIN THANH TOÁN</button>
+                <button class="menu-button" id="logoutButton">ĐĂNG XUẤT</button>
+            </div>
+            <button class="back-button" id="backFromAccountButton">QUAY LẠI</button>
+        </div>
+
+        <!-- Character Panel -->
+        <div class="character-panel" id="characterPanel">
+            <div class="panel-title">NHÂN VẬT</div>
+            <div class="character-grid" id="characterGrid">
+                <!-- Characters will be added dynamically -->
+            </div>
+            <button class="back-button" id="backFromCharactersButton">QUAY LẠI</button>
+        </div>
+
+        <!-- Shop Panel -->
+        <div class="shop-panel" id="shopPanel">
+            <div class="panel-title">CỬA HÀNG</div>
+            <div class="shop-grid" id="shopGrid">
+                <!-- Shop items will be added dynamically -->
+            </div>
+            <button class="back-button" id="backFromShopButton">QUAY LẠI</button>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="panel-title">CÀI ĐẶT</div>
+            <div class="settings-grid">
+                <div class="settings-item">
+                    <div class="settings-name">Âm thanh</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-name">Nhạc nền</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="musicToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-name">Rung</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="vibrationToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-name">Âm thanh khích lệ</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="encouragementToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-name">Hiển thị nút điều khiển</div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="controlsToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <button class="back-button" id="backFromSettingsButton">QUAY LẠI</button>
+        </div>
+
+        <!-- Payment Panel -->
+        <div class="payment-panel" id="paymentPanel">
+            <div class="payment-title">THANH TOÁN</div>
+            <div class="payment-form">
+                <input type="text" class="payment-input" id="paymentCardNameInput" placeholder="Tên chủ thẻ">
+                <input type="text" class="payment-input" id="paymentCardNumberInput" placeholder="Số thẻ">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" class="payment-input" id="paymentCardExpiryInput" placeholder="MM/YY" style="width: 50%;">
+                    <input type="text" class="payment-input" id="paymentCardCVVInput" placeholder="CVV" style="width: 50%;">
+                </div>
+                <div id="paymentAmount" style="text-align: center; margin: 10px 0; font-size: 18px; color: #FFD700;"></div>
+            </div>
+            <div class="payment-buttons">
+                <button class="menu-button" id="confirmPaymentButton">XÁC NHẬN</button>
+                <button class="menu-button" id="cancelPaymentButton">HỦY</button>
+            </div>
+        </div>
+
+        <!-- Level Complete Panel -->
+        <div class="level-complete" id="levelCompletePanel">
+            <div class="level-complete-title">LEVEL HOÀN THÀNH!</div>
+            <div class="level-complete-stats" id="levelCompleteStats">
+                Điểm: 0<br>
+                Coins: 0<br>
+                Level: 1
+            </div>
+            <div class="level-complete-buttons">
+                <button class="menu-button" id="nextLevelButton">LEVEL TIẾP</button>
+                <button class="menu-button" id="mainMenuButton">MENU CHÍNH</button>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <script>
+        // Game configuration
+        const CONFIG = {
+            CANVAS_WIDTH: 800,
+            CANVAS_HEIGHT: 600,
+            GRAVITY: 0.8,
+            JUMP_FORCE: -15,
+            DOUBLE_JUMP_FORCE: -20,
+            HORIZONTAL_SPEED: 5,
+            FRICTION: 0.85,
+            PLATFORM_SPEED: 2,
+            COIN_VALUE: 10,
+            LEVEL_SCORE_THRESHOLD: 100,
+            PLATFORM_COUNT: 7,
+            PLATFORM_GAP: 100,
+            COIN_CHANCE: 0.5
+        };
+
+        // Game state
+        let gameState = {
+            isPlaying: false,
+            isPaused: false,
+            score: 0,
+            level: 1,
+            coins: 0,
+            lives: 3,
+            progress: 0,
+            sessionId: generateUUID(),
+            authToken: localStorage.getItem('pixel_jump_auth_token'),
+            user: null,
+            settings: {
+                sound: true,
+                music: true,
+                vibration: true,
+                encouragement: true,
+                controls: true
+            },
+            characters: [
+                { id: 'pixel_hero', name: 'Pixel Hero', color: '#FFD700', price: 0, unlocked: true, selected: true },
+                { id: 'shadow_ninja', name: 'Shadow Ninja', color: '#2C2C2C', price: 100, unlocked: false, selected: false },
+                { id: 'fire_spirit', name: 'Fire Spirit', color: '#FF4500', price: 200, unlocked: false, selected: false },
+                { id: 'ice_crystal', name: 'Ice Crystal', color: '#00BFFF', price: 300, unlocked: false, selected: false },
+                { id: 'nature_guardian', name: 'Nature Guardian', color: '#32CD32', price: 400, unlocked: false, selected: false },
+                { id: 'lightning_bolt', name: 'Lightning Bolt', color: '#FFFF00', price: 500, unlocked: false, selected: false }
+            ],
+            shopItems: [
+                { id: 'coin_pack_small', name: 'Gói 100 Coins', price: 0.99, coins: 100, type: 'coins' },
+                { id: 'coin_pack_medium', name: 'Gói 500 Coins', price: 4.99, coins: 500, type: 'coins' },
+                { id: 'coin_pack_large', name: 'Gói 1000 Coins', price: 9.99, coins: 1000, type: 'coins' },
+                { id: 'coin_pack_xl', name: 'Gói 5000 Coins', price: 24.99, coins: 5000, type: 'coins' },
+                { id: 'extra_life', name: 'Mạng Bổ Sung', price: 50, coins: 0, type: 'powerup' },
+                { id: 'double_coins', name: 'Coins x2 (1h)', price: 100, coins: 0, type: 'powerup' },
+                { id: 'shield', name: 'Khiên Bảo Vệ', price: 150, coins: 0, type: 'powerup' },
+                { id: 'magnet', name: 'Nam Châm Coins', price: 200, coins: 0, type: 'powerup' }
+            ],
+            activeLevel: {
+                type: 'normal',
+                difficulty: 1,
+                platformSpeed: 2,
+                platformGap: 100,
+                hasBoss: false
+            },
+            currentPurchase: null,
+            purchaseHistory: [],
+            levelCompleted: false
+        };
+
+        // Load saved settings
+        loadSettings();
+
+        // Game objects
+        let player = {
+            x: 400,
+            y: 450, // FIX: Đặt player ở vị trí an toàn hơn
+            width: 30,
+            height: 30,
+            velocityX: 0,
+            velocityY: 0,
+            onGround: false,
+            canDoubleJump: true,
+            character: 'pixel_hero'
+        };
+
+        let platforms = [];
+        let coins = [];
+        let camera = { y: 0 };
+
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Resize canvas to fit window
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            
+            // Maintain aspect ratio
+            const aspectRatio = CONFIG.CANVAS_WIDTH / CONFIG.CANVAS_HEIGHT;
+            let canvasWidth = containerWidth;
+            let canvasHeight = canvasWidth / aspectRatio;
+            
+            if (canvasHeight > containerHeight) {
+                canvasHeight = containerHeight;
+                canvasWidth = canvasHeight * aspectRatio;
+            }
+            
+            canvas.style.width = canvasWidth + 'px';
+            canvas.style.height = canvasHeight + 'px';
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Event listeners
+        document.getElementById('startButton').addEventListener('click', startGame);
+        document.getElementById('characterButton').addEventListener('click', showCharacters);
+        document.getElementById('shopButton').addEventListener('click', showShop);
+        document.getElementById('settingsButton').addEventListener('click', showSettings);
+        document.getElementById('authButton').addEventListener('click', () => {
+            if (gameState.user && !gameState.user.is_anonymous) {
+                showAccount();
+            } else {
+                showAuth();
+            }
+        });
+        document.getElementById('loginTab').addEventListener('click', () => switchAuthTab('login'));
+        document.getElementById('registerTab').addEventListener('click', () => switchAuthTab('register'));
+        document.getElementById('loginButton').addEventListener('click', login);
+        document.getElementById('registerButton').addEventListener('click', register);
+        document.getElementById('cancelLoginButton').addEventListener('click', hideAuth);
+        document.getElementById('cancelRegisterButton').addEventListener('click', hideAuth);
+        document.getElementById('backFromCharactersButton').addEventListener('click', hideCharacters);
+        document.getElementById('backFromShopButton').addEventListener('click', hideShop);
+        document.getElementById('backFromSettingsButton').addEventListener('click', hideSettings);
+        document.getElementById('backFromAccountButton').addEventListener('click', hideAccount);
+        document.getElementById('nextLevelButton').addEventListener('click', startNextLevel);
+        document.getElementById('mainMenuButton').addEventListener('click', returnToMainMenu);
+        document.getElementById('soundToggle').addEventListener('change', updateSettings);
+        document.getElementById('musicToggle').addEventListener('change', updateSettings);
+        document.getElementById('vibrationToggle').addEventListener('change', updateSettings);
+        document.getElementById('encouragementToggle').addEventListener('change', updateSettings);
+        document.getElementById('controlsToggle').addEventListener('change', updateSettings);
+        document.getElementById('confirmPaymentButton').addEventListener('click', confirmPayment);
+        document.getElementById('cancelPaymentButton').addEventListener('click', cancelPayment);
+        document.getElementById('purchaseHistoryButton').addEventListener('click', showPurchaseHistory);
+        document.getElementById('paymentInfoButton').addEventListener('click', showPaymentInfo);
+        document.getElementById('logoutButton').addEventListener('click', logout);
+        document.getElementById('leftButton').addEventListener('mousedown', moveLeft);
+        document.getElementById('leftButton').addEventListener('touchstart', moveLeft);
+        document.getElementById('rightButton').addEventListener('mousedown', moveRight);
+        document.getElementById('rightButton').addEventListener('touchstart', moveRight);
+        document.getElementById('jumpButton').addEventListener('click', jumpButton);
+
+        // Canvas event listeners
+        canvas.addEventListener('click', handleClick);
+        canvas.addEventListener('touchstart', handleTouch);
+
+        // Helper functions
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Authentication functions
+        function switchAuthTab(tab) {
+            // Hide all content
+            document.querySelectorAll('.auth-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.auth-tab').forEach(tabEl => {
+                tabEl.classList.remove('active');
+            });
+            
+            // Activate selected tab and content
+            if (tab === 'login') {
+                document.getElementById('loginTab').classList.add('active');
+                document.getElementById('loginContent').classList.add('active');
+            } else {
+                document.getElementById('registerTab').classList.add('active');
+                document.getElementById('registerContent').classList.add('active');
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('authPanel').style.display = 'block';
+            switchAuthTab('login'); // Default to login tab
+        }
+
+        function hideAuth() {
+            document.getElementById('authPanel').style.display = 'none';
+        }
+
+        function createAnonymousUser() {
+            const username = 'Player_' + Math.floor(Math.random() * 10000);
+            gameState.user = {
+                id: generateUUID(),
+                username: username,
+                email: null,
+                is_anonymous: true,
+                total_coins: 0,
+                unlocked_characters: ['pixel_hero'],
+                high_score: 0,
+                created_at: new Date().toISOString(),
+                purchase_history: [],
+                payment_info: null
+            };
+            
+            gameState.authToken = generateUUID();
+            localStorage.setItem('pixel_jump_auth_token', gameState.authToken);
+            localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+            
+            updateAuthStatus();
+            return gameState.user;
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showNotification('Vui lòng nhập email và mật khẩu');
+                return;
+            }
+
+            // Simulate login - in a real app, this would call an API
+            showNotification('Đang đăng nhập...');
+            
+            setTimeout(() => {
+                // Check if user exists in localStorage
+                const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                const user = users.find(u => u.email === email);
+                
+                if (user && user.password === password) {
+                    // Login successful
+                    gameState.user = {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        is_anonymous: false,
+                        total_coins: user.total_coins || 500,
+                        unlocked_characters: user.unlocked_characters || ['pixel_hero'],
+                        high_score: user.high_score || 0,
+                        created_at: user.created_at,
+                        purchase_history: user.purchase_history || [],
+                        payment_info: user.payment_info || null
+                    };
+                    
+                    gameState.authToken = generateUUID();
+                    localStorage.setItem('pixel_jump_auth_token', gameState.authToken);
+                    localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                    
+                    // Update character unlocks
+                    updateCharacterUnlocks();
+                    
+                    updateAuthStatus();
+                    hideAuth();
+                    showNotification('Đăng nhập thành công!');
+                    
+                    // Update coins display
+                    gameState.coins = gameState.user.total_coins;
+                    updateUI();
+                } else {
+                    showNotification('Email hoặc mật khẩu không đúng!');
+                }
+            }, 1000);
+        }
+
+        function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const username = document.getElementById('registerUsername').value || email.split('@')[0];
+            const cardName = document.getElementById('registerCardName').value;
+            const cardNumber = document.getElementById('registerCardNumber').value;
+            const cardExpiry = document.getElementById('registerCardExpiry').value;
+            const cardCVV = document.getElementById('registerCardCVV').value;
+
+            if (!email || !password || !username) {
+                showNotification('Vui lòng nhập email, mật khẩu và tên người dùng');
+                return;
+            }
+
+            // Simulate registration - in a real app, this would call an API
+            showNotification('Đang đăng ký...');
+            
+            setTimeout(() => {
+                // Check if user already exists
+                const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                if (users.some(u => u.email === email)) {
+                    showNotification('Email đã được sử dụng!');
+                    return;
+                }
+                
+                // Create new user
+                const newUser = {
+                    id: generateUUID(),
+                    username: username,
+                    email: email,
+                    password: password, // In a real app, this would be hashed
+                    is_anonymous: false,
+                    total_coins: 1000, // Give more starting coins for new registrations
+                    unlocked_characters: ['pixel_hero'],
+                    high_score: 0,
+                    created_at: new Date().toISOString(),
+                    purchase_history: [],
+                    payment_info: {
+                        card_name: cardName,
+                        card_number: cardNumber ? cardNumber.slice(-4).padStart(16, '*') : null,
+                        card_expiry: cardExpiry,
+                        updated_at: new Date().toISOString()
+                    }
+                };
+                
+                // Save user to localStorage
+                users.push(newUser);
+                localStorage.setItem('pixel_jump_users', JSON.stringify(users));
+                
+                // Log in the new user
+                gameState.user = {
+                    id: newUser.id,
+                    username: newUser.username,
+                    email: newUser.email,
+                    is_anonymous: false,
+                    total_coins: newUser.total_coins,
+                    unlocked_characters: newUser.unlocked_characters,
+                    high_score: newUser.high_score,
+                    created_at: newUser.created_at,
+                    purchase_history: newUser.purchase_history,
+                    payment_info: newUser.payment_info
+                };
+                
+                gameState.authToken = generateUUID();
+                localStorage.setItem('pixel_jump_auth_token', gameState.authToken);
+                localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                
+                // Update character unlocks
+                updateCharacterUnlocks();
+                
+                updateAuthStatus();
+                hideAuth();
+                showNotification('Đăng ký thành công! Bạn nhận được 1000 coins!');
+                
+                // Update coins display
+                gameState.coins = gameState.user.total_coins;
+                updateUI();
+            }, 1000);
+        }
+
+        function logout() {
+            localStorage.removeItem('pixel_jump_auth_token');
+            localStorage.removeItem('pixel_jump_user');
+            gameState.user = null;
+            gameState.authToken = null;
+            
+            // Create anonymous user
+            createAnonymousUser();
+            
+            // Reset coins
+            gameState.coins = 0;
+            updateUI();
+            
+            hideAccount();
+            showNotification('Đã đăng xuất thành công!');
+        }
+
+        function updateAuthStatus() {
+            const authStatus = document.getElementById('authStatus');
+            const authButton = document.getElementById('authButton');
+            
+            if (gameState.user) {
+                if (gameState.user.is_anonymous) {
+                    authStatus.textContent = `Chơi ẩn danh: ${gameState.user.username}`;
+                    authButton.textContent = 'ĐĂNG NHẬP / ĐĂNG KÝ';
+                } else {
+                    authStatus.textContent = `Xin chào: ${gameState.user.username}`;
+                    authButton.textContent = 'TÀI KHOẢN';
+                }
+            }
+        }
+
+        function showAccount() {
+            if (!gameState.user || gameState.user.is_anonymous) {
+                showAuth();
+                return;
+            }
+            
+            const accountInfo = document.getElementById('accountInfo');
+            accountInfo.innerHTML = '';
+            
+            // Create account info items
+            const infoItems = [
+                { label: 'Tên người dùng', value: gameState.user.username },
+                { label: 'Email', value: gameState.user.email },
+                { label: 'Coins', value: gameState.user.total_coins },
+                { label: 'Điểm cao nhất', value: gameState.user.high_score },
+                { label: 'Nhân vật đã mở khóa', value: gameState.user.unlocked_characters.length },
+                { label: 'Ngày tham gia', value: new Date(gameState.user.created_at).toLocaleDateString() }
+            ];
+            
+            infoItems.forEach(item => {
+                const infoItem = document.createElement('div');
+                infoItem.className = 'account-info-item';
+                
+                const label = document.createElement('div');
+                label.className = 'account-info-label';
+                label.textContent = item.label;
+                
+                const value = document.createElement('div');
+                value.className = 'account-info-value';
+                value.textContent = item.value;
+                
+                infoItem.appendChild(label);
+                infoItem.appendChild(value);
+                accountInfo.appendChild(infoItem);
+            });
+            
+            document.getElementById('accountPanel').style.display = 'flex';
+        }
+
+        function hideAccount() {
+            document.getElementById('accountPanel').style.display = 'none';
+        }
+
+        function showPurchaseHistory() {
+            if (!gameState.user || !gameState.user.purchase_history || gameState.user.purchase_history.length === 0) {
+                showNotification('Bạn chưa có lịch sử mua hàng nào!');
+                return;
+            }
+            
+            let historyText = 'LỊCH SỬ MUA HÀNG:\n\n';
+            gameState.user.purchase_history.forEach((purchase, index) => {
+                historyText += `${index + 1}. ${purchase.item_name} - $${purchase.amount.toFixed(2)}\n`;
+                historyText += `   Ngày: ${new Date(purchase.date).toLocaleDateString()}\n`;
+                historyText += `   ID: ${purchase.transaction_id}\n\n`;
+            });
+            
+            alert(historyText);
+        }
+
+        function showPaymentInfo() {
+            if (!gameState.user || !gameState.user.payment_info) {
+                showNotification('Bạn chưa có thông tin thanh toán!');
+                return;
+            }
+            
+            let infoText = 'THÔNG TIN THANH TOÁN:\n\n';
+            infoText += `Tên chủ thẻ: ${gameState.user.payment_info.card_name || 'Chưa cung cấp'}\n`;
+            infoText += `Số thẻ: ${gameState.user.payment_info.card_number || 'Chưa cung cấp'}\n`;
+            infoText += `Hết hạn: ${gameState.user.payment_info.card_expiry || 'Chưa cung cấp'}\n`;
+            infoText += `Cập nhật: ${new Date(gameState.user.payment_info.updated_at).toLocaleDateString()}\n`;
+            
+            alert(infoText);
+        }
+
+        // Character functions
+        function showCharacters() {
+            const characterGrid = document.getElementById('characterGrid');
+            characterGrid.innerHTML = '';
+            
+            gameState.characters.forEach(character => {
+                const characterItem = document.createElement('div');
+                characterItem.className = `character-item ${character.selected ? 'selected' : ''}`;
+                
+                const characterPreview = document.createElement('div');
+                characterPreview.className = 'character-preview';
+                characterPreview.style.backgroundColor = character.color;
+                
+                const characterName = document.createElement('div');
+                characterName.className = 'character-name';
+                characterName.textContent = character.name;
+                
+                const characterStatus = document.createElement('div');
+                characterStatus.className = 'character-status';
+                
+                const characterButton = document.createElement('button');
+                characterButton.className = 'character-button';
+                
+                if (character.unlocked) {
+                    characterStatus.textContent = 'Đã mở khóa';
+                    if (character.selected) {
+                        characterButton.textContent = 'ĐANG DÙNG';
+                    } else {
+                        characterButton.textContent = 'CHỌN';
+                        characterButton.addEventListener('click', () => selectCharacter(character.id));
+                    }
+                } else {
+                    characterStatus.textContent = `${character.price} coins`;
+                    characterButton.textContent = 'MUA';
+                    characterButton.addEventListener('click', () => purchaseCharacter(character.id));
+                }
+                
+                characterItem.appendChild(characterPreview);
+                characterItem.appendChild(characterName);
+                characterItem.appendChild(characterStatus);
+                characterItem.appendChild(characterButton);
+                
+                characterGrid.appendChild(characterItem);
+            });
+            
+            document.getElementById('characterPanel').style.display = 'flex';
+        }
+
+        function hideCharacters() {
+            document.getElementById('characterPanel').style.display = 'none';
+        }
+
+        function selectCharacter(characterId) {
+            gameState.characters.forEach(character => {
+                character.selected = (character.id === characterId);
+            });
+            
+            player.character = characterId;
+            
+            // Save to local storage
+            localStorage.setItem('pixel_jump_selected_character', characterId);
+            
+            showCharacters(); // Refresh the character panel
+            showNotification(`Đã chọn nhân vật: ${gameState.characters.find(c => c.id === characterId).name}`);
+        }
+
+        function purchaseCharacter(characterId) {
+            const character = gameState.characters.find(c => c.id === characterId);
+            
+            if (!character) return;
+            
+            if (gameState.coins < character.price) {
+                showNotification('Không đủ coins! Hãy mua thêm coins từ cửa hàng.');
+                return;
+            }
+            
+            // Check if user is logged in
+            if (!gameState.user || gameState.user.is_anonymous) {
+                showNotification('Vui lòng đăng nhập để mua nhân vật!');
+                showAuth();
+                return;
+            }
+            
+            // Deduct coins
+            gameState.coins -= character.price;
+            if (gameState.user) {
+                gameState.user.total_coins = gameState.coins;
+                
+                // Add to unlocked characters
+                if (!gameState.user.unlocked_characters.includes(characterId)) {
+                    gameState.user.unlocked_characters.push(characterId);
+                }
+                
+                localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                
+                // Update user in users list
+                const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                const userIndex = users.findIndex(u => u.id === gameState.user.id);
+                if (userIndex !== -1) {
+                    users[userIndex].total_coins = gameState.user.total_coins;
+                    users[userIndex].unlocked_characters = gameState.user.unlocked_characters;
+                    localStorage.setItem('pixel_jump_users', JSON.stringify(users));
+                }
+            }
+            
+            // Unlock character
+            character.unlocked = true;
+            
+            // Save unlocked characters to local storage
+            const unlockedCharacters = gameState.characters.filter(c => c.unlocked).map(c => c.id);
+            localStorage.setItem('pixel_jump_unlocked_characters', JSON.stringify(unlockedCharacters));
+            
+            updateUI();
+            showCharacters(); // Refresh the character panel
+            showNotification(`Đã mua nhân vật: ${character.name}`);
+            
+            // Play purchase sound
+            playSound('purchase');
+        }
+
+        function updateCharacterUnlocks() {
+            if (gameState.user && gameState.user.unlocked_characters) {
+                gameState.user.unlocked_characters.forEach(characterId => {
+                    const character = gameState.characters.find(c => c.id === characterId);
+                    if (character) {
+                        character.unlocked = true;
+                    }
+                });
+            }
+            
+            // Also check local storage for unlocked characters
+            const storedUnlocked = localStorage.getItem('pixel_jump_unlocked_characters');
+            if (storedUnlocked) {
+                try {
+                    const unlockedIds = JSON.parse(storedUnlocked);
+                    unlockedIds.forEach(characterId => {
+                        const character = gameState.characters.find(c => c.id === characterId);
+                        if (character) {
+                            character.unlocked = true;
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error parsing unlocked characters:', e);
+                }
+            }
+            
+            // Check for selected character
+            const selectedCharacter = localStorage.getItem('pixel_jump_selected_character');
+            if (selectedCharacter) {
+                const character = gameState.characters.find(c => c.id === selectedCharacter);
+                if (character && character.unlocked) {
+                    gameState.characters.forEach(c => c.selected = false);
+                    character.selected = true;
+                    player.character = character.id;
+                }
+            }
+        }
+
+        // Shop functions
+        function showShop() {
+            const shopGrid = document.getElementById('shopGrid');
+            shopGrid.innerHTML = '';
+            
+            gameState.shopItems.forEach(item => {
+                const shopItem = document.createElement('div');
+                shopItem.className = 'shop-item';
+                
+                const itemPreview = document.createElement('div');
+                itemPreview.className = 'shop-item-preview';
+                
+                if (item.type === 'coins') {
+                    itemPreview.innerHTML = `<span style="font-size: 36px;">💰</span>`;
+                } else {
+                    // Different icons for different powerups
+                    const icons = {
+                        'extra_life': '❤️',
+                        'double_coins': '✨',
+                        'shield': '🛡️',
+                        'magnet': '🧲'
+                    };
+                    itemPreview.innerHTML = `<span style="font-size: 36px;">${icons[item.id] || '🎁'}</span>`;
+                }
+                
+                const itemName = document.createElement('div');
+                itemName.className = 'shop-item-name';
+                itemName.textContent = item.name;
+                
+                const itemPrice = document.createElement('div');
+                itemPrice.className = 'shop-item-price';
+                
+                if (item.type === 'coins') {
+                    itemPrice.textContent = `$${item.price.toFixed(2)}`;
+                } else {
+                    itemPrice.textContent = `${item.price} coins`;
+                }
+                
+                const itemButton = document.createElement('button');
+                itemButton.className = 'shop-button';
+                itemButton.textContent = 'MUA';
+                itemButton.addEventListener('click', () => purchaseItem(item.id));
+                
+                shopItem.appendChild(itemPreview);
+                shopItem.appendChild(itemName);
+                shopItem.appendChild(itemPrice);
+                shopItem.appendChild(itemButton);
+                
+                shopGrid.appendChild(shopItem);
+            });
+            
+            document.getElementById('shopPanel').style.display = 'flex';
+        }
+
+        function hideShop() {
+            document.getElementById('shopPanel').style.display = 'none';
+        }
+
+        function purchaseItem(itemId) {
+            const item = gameState.shopItems.find(i => i.id === itemId);
+            
+            if (!item) return;
+            
+            // Check if user is logged in for coin purchases
+            if (item.type === 'coins' && (!gameState.user || gameState.user.is_anonymous)) {
+                showNotification('Vui lòng đăng nhập để mua coins!');
+                showAuth();
+                return;
+            }
+            
+            if (item.type === 'coins') {
+                // Check if user has payment info
+                if (!gameState.user.payment_info || !gameState.user.payment_info.card_number) {
+                    showNotification('Vui lòng cập nhật thông tin thanh toán!');
+                    showAuth();
+                    return;
+                }
+                
+                // Set current purchase and show payment panel
+                gameState.currentPurchase = {
+                    item_id: item.id,
+                    item_name: item.name,
+                    amount: item.price,
+                    coins: item.coins
+                };
+                
+                // Pre-fill payment info
+                document.getElementById('paymentCardNameInput').value = gameState.user.payment_info.card_name || '';
+                document.getElementById('paymentCardNumberInput').value = gameState.user.payment_info.card_number ? 
+                    gameState.user.payment_info.card_number.replace(/^\*+/, '') : '';
+                document.getElementById('paymentCardExpiryInput').value = gameState.user.payment_info.card_expiry || '';
+                
+                document.getElementById('paymentAmount').textContent = `Thanh toán: $${item.price.toFixed(2)} cho ${item.coins} coins`;
+                document.getElementById('paymentPanel').style.display = 'block';
+            } else {
+                // Check if player has enough coins
+                if (gameState.coins < item.price) {
+                    showNotification('Không đủ coins! Hãy mua thêm coins.');
+                    return;
+                }
+                
+                // Deduct coins
+                gameState.coins -= item.price;
+                if (gameState.user) {
+                    gameState.user.total_coins = gameState.coins;
+                    localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                    
+                    // Update user in users list
+                    const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === gameState.user.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].total_coins = gameState.user.total_coins;
+                        localStorage.setItem('pixel_jump_users', JSON.stringify(users));
+                    }
+                }
+                
+                // Apply powerup effect
+                applyPowerup(item.id);
+                
+                updateUI();
+                showNotification(`Đã mua thành công: ${item.name}!`);
+                playSound('purchase');
+            }
+        }
+
+        function confirmPayment() {
+            const cardName = document.getElementById('paymentCardNameInput').value;
+            const cardNumber = document.getElementById('paymentCardNumberInput').value;
+            const cardExpiry = document.getElementById('paymentCardExpiryInput').value;
+            const cardCVV = document.getElementById('paymentCardCVVInput').value;
+            
+            if (!cardName || !cardNumber || !cardExpiry || !cardCVV) {
+                showNotification('Vui lòng điền đầy đủ thông tin thẻ');
+                return;
+            }
+            
+            if (!gameState.currentPurchase) {
+                showNotification('Đã xảy ra lỗi. Vui lòng thử lại.');
+                cancelPayment();
+                return;
+            }
+            
+            // Simulate payment processing
+            showNotification('Đang xử lý thanh toán...');
+            
+            setTimeout(() => {
+                // Add coins
+                gameState.coins += gameState.currentPurchase.coins;
+                
+                // Update user data
+                if (gameState.user) {
+                    gameState.user.total_coins = gameState.coins;
+                    
+                    // Update payment info
+                    gameState.user.payment_info = {
+                        card_name: cardName,
+                        card_number: cardNumber.slice(-4).padStart(16, '*'),
+                        card_expiry: cardExpiry,
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    // Add to purchase history
+                    if (!gameState.user.purchase_history) {
+                        gameState.user.purchase_history = [];
+                    }
+                    
+                    const purchase = {
+                        transaction_id: generateUUID(),
+                        item_id: gameState.currentPurchase.item_id,
+                        item_name: gameState.currentPurchase.item_name,
+                        amount: gameState.currentPurchase.amount,
+                        date: new Date().toISOString(),
+                        payment_method: 'Credit Card',
+                        last_four: cardNumber.slice(-4)
+                    };
+                    
+                    gameState.user.purchase_history.push(purchase);
+                    localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                    
+                    // Update user in users list
+                    const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === gameState.user.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].total_coins = gameState.user.total_coins;
+                        users[userIndex].payment_info = gameState.user.payment_info;
+                        users[userIndex].purchase_history = gameState.user.purchase_history;
+                        localStorage.setItem('pixel_jump_users', JSON.stringify(users));
+                    }
+                }
+                
+                // Clear payment form
+                document.getElementById('paymentCardNameInput').value = '';
+                document.getElementById('paymentCardNumberInput').value = '';
+                document.getElementById('paymentCardExpiryInput').value = '';
+                document.getElementById('paymentCardCVVInput').value = '';
+                
+                // Hide payment panel
+                document.getElementById('paymentPanel').style.display = 'none';
+                
+                const purchasedCoins = gameState.currentPurchase.coins;
+                gameState.currentPurchase = null;
+                
+                updateUI();
+                showNotification(`Thanh toán thành công! Đã thêm ${purchasedCoins} coins.`);
+                playSound('purchase');
+            }, 1500);
+        }
+
+        function cancelPayment() {
+            document.getElementById('paymentPanel').style.display = 'none';
+            gameState.currentPurchase = null;
+        }
+
+        function applyPowerup(powerupId) {
+            switch (powerupId) {
+                case 'extra_life':
+                    gameState.lives++;
+                    updateUI();
+                    break;
+                case 'double_coins':
+                    // This would normally set a timer for double coins
+                    showNotification('Coins x2 đã kích hoạt trong 1 giờ!');
+                    break;
+                case 'shield':
+                    // This would normally add a shield to the player
+                    showNotification('Khiên bảo vệ đã kích hoạt!');
+                    break;
+                case 'magnet':
+                    // This would normally add a coin magnet effect
+                    showNotification('Nam châm coins đã kích hoạt!');
+                    break;
+            }
+        }
+
+        // Settings functions
+        function showSettings() {
+            // Update toggle states based on current settings
+            document.getElementById('soundToggle').checked = gameState.settings.sound;
+            document.getElementById('musicToggle').checked = gameState.settings.music;
+            document.getElementById('vibrationToggle').checked = gameState.settings.vibration;
+            document.getElementById('encouragementToggle').checked = gameState.settings.encouragement;
+            document.getElementById('controlsToggle').checked = gameState.settings.controls;
+            
+            document.getElementById('settingsPanel').style.display = 'flex';
+        }
+
+        function hideSettings() {
+            document.getElementById('settingsPanel').style.display = 'none';
+        }
+
+        function updateSettings() {
+            gameState.settings.sound = document.getElementById('soundToggle').checked;
+            gameState.settings.music = document.getElementById('musicToggle').checked;
+            gameState.settings.vibration = document.getElementById('vibrationToggle').checked;
+            gameState.settings.encouragement = document.getElementById('encouragementToggle').checked;
+            gameState.settings.controls = document.getElementById('controlsToggle').checked;
+            
+            // Update controls visibility
+            document.getElementById('gameUI').style.display = gameState.settings.controls && gameState.isPlaying ? 'block' : 'none';
+            
+            // Save settings to local storage
+            localStorage.setItem('pixel_jump_settings', JSON.stringify(gameState.settings));
+            
+            showNotification('Cài đặt đã được lưu!');
+        }
+
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('pixel_jump_settings');
+            if (savedSettings) {
+                try {
+                    const settings = JSON.parse(savedSettings);
+                    gameState.settings = { ...gameState.settings, ...settings };
+                } catch (e) {
+                    console.error('Error parsing settings:', e);
+                }
+            }
+        }
+
+        // Game functions
+        function initGame() {
+            // Create initial platforms - FIX: Đảm bảo có platform đầu tiên ở vị trí player spawn
+            platforms = [];
+            
+            // Platform đầu tiên ở vị trí player spawn
+            platforms.push({
+                x: 350,
+                y: 480,
+                width: 100,
+                height: 20
+            });
+            
+            // Tạo các platform khác
+            for (let i = 1; i < CONFIG.PLATFORM_COUNT; i++) {
+                const platformWidth = Math.random() * 50 + 70; // 70-120px width
+                const x = Math.random() * (CONFIG.CANVAS_WIDTH - platformWidth);
+                const y = 480 - (i * CONFIG.PLATFORM_GAP);
+                
+                platforms.push({
+                    x,
+                    y,
+                    width: platformWidth,
+                    height: 20
+                });
+            }
+
+            // Create coins
+            coins = [];
+            platforms.forEach((platform, index) => {
+                if (index > 0 && Math.random() < CONFIG.COIN_CHANCE) { // Skip first platform
+                    coins.push({
+                        x: platform.x + platform.width / 2 - 10,
+                        y: platform.y - 30,
+                        collected: false
+                    });
+                }
+            });
+
+            // Reset player - FIX: Đặt player ở vị trí an toàn trên platform đầu tiên
+            player.x = 375; // Giữa platform đầu tiên
+            player.y = 450; // Trên platform đầu tiên
+            player.velocityX = 0;
+            player.velocityY = 0;
+            player.onGround = true; // FIX: Đảm bảo player bắt đầu trên mặt đất
+            player.canDoubleJump = true;
+
+            // Reset camera
+            camera.y = 0;
+            
+            // Reset level completion flag
+            gameState.levelCompleted = false;
+            
+            // Set up level
+            setupLevel(gameState.level);
+        }
+
+        function setupLevel(level) {
+            // Define level types based on level number
+            const levelTypes = [
+                'normal',      // Level 1
+                'fast',        // Level 2
+                'coins',       // Level 3
+                'gap',         // Level 4
+                'boss',        // Level 5
+                'ice',         // Level 6
+                'bounce',      // Level 7
+                'wind',        // Level 8
+                'gravity',     // Level 9
+                'boss',        // Level 10
+                'master'       // Level 11+
+            ];
+            
+            // Calculate level cycle and difficulty
+            const levelCycle = Math.floor((level - 1) / 11);
+            const levelIndex = (level - 1) % 11;
+            const difficulty = 1 + levelCycle * 0.5; // Increase difficulty by 50% each cycle
+            
+            gameState.activeLevel = {
+                type: levelTypes[levelIndex] || 'master',
+                difficulty: difficulty,
+                platformSpeed: CONFIG.PLATFORM_SPEED * difficulty,
+                platformGap: CONFIG.PLATFORM_GAP * (1 - levelCycle * 0.1), // Platforms get closer as difficulty increases
+                hasBoss: levelTypes[levelIndex] === 'boss'
+            };
+            
+            // Update UI to show level info
+            const levelNames = {
+                'normal': 'NORMAL',
+                'fast': 'TĂNG TỐC',
+                'coins': 'COINS MANIA',
+                'gap': 'NHẢY XA',
+                'boss': 'BOSS LEVEL',
+                'ice': 'ICE WORLD',
+                'bounce': 'BOUNCE',
+                'wind': 'WIND',
+                'gravity': 'GRAVITY SHIFT',
+                'master': 'MASTER LEVEL'
+            };
+            
+            document.getElementById('levelDisplay').textContent = `Level ${level}: ${levelNames[gameState.activeLevel.type]}`;
+        }
+
+        function startGame() {
+            if (!gameState.user) {
+                createAnonymousUser();
+            }
+
+            gameState.isPlaying = true;
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.lives = 3;
+            gameState.progress = 0;
+
+            document.getElementById('menuOverlay').style.display = 'none';
+            
+            // Show game controls if enabled
+            document.getElementById('gameUI').style.display = gameState.settings.controls ? 'block' : 'none';
+            
+            initGame();
+            gameLoop();
+            
+            // Play start sound
+            playSound('start');
+        }
+
+        function startNextLevel() {
+            gameState.level++;
+            document.getElementById('levelCompletePanel').style.display = 'none';
+            initGame();
+            gameState.isPlaying = true;
+            gameState.levelCompleted = false; // FIX: Reset level completed flag
+            
+            // Show game controls if enabled
+            document.getElementById('gameUI').style.display = gameState.settings.controls ? 'block' : 'none';
+            
+            // Play level up sound
+            playSound('levelUp');
+        }
+
+        function returnToMainMenu() {
+            document.getElementById('levelCompletePanel').style.display = 'none';
+            document.getElementById('menuOverlay').style.display = 'flex';
+            document.getElementById('gameUI').style.display = 'none';
+            gameState.isPlaying = false;
+        }
+
+        function gameLoop() {
+            if (!gameState.isPlaying) return;
+
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Apply level-specific effects
+            applyLevelEffects();
+            
+            // Update player physics
+            player.velocityY += CONFIG.GRAVITY;
+            player.x += player.velocityX;
+            player.y += player.velocityY;
+
+            // Apply friction
+            player.velocityX *= CONFIG.FRICTION;
+
+            // Check platform collisions - FIX: Cải thiện collision detection
+            player.onGround = false;
+            for (let platform of platforms) {
+                if (player.x < platform.x + platform.width &&
+                    player.x + player.width > platform.x &&
+                    player.y + player.height > platform.y &&
+                    player.y + player.height < platform.y + platform.height + 10 && // FIX: Thêm tolerance
+                    player.velocityY >= 0) { // FIX: Chỉ collision khi rơi xuống
+                    
+                    player.y = platform.y - player.height;
+                    player.velocityY = 0;
+                    player.onGround = true;
+                    player.canDoubleJump = true;
+                    break; // FIX: Break sau khi tìm thấy collision đầu tiên
+                }
+            }
+
+            // Check coin collection
+            for (let coin of coins) {
+                if (!coin.collected &&
+                    player.x < coin.x + 20 &&
+                    player.x + player.width > coin.x &&
+                    player.y < coin.y + 20 &&
+                    player.y + player.height > coin.y) {
+                    
+                    coin.collected = true;
+                    gameState.coins += CONFIG.COIN_VALUE;
+                    gameState.score += CONFIG.COIN_VALUE;
+                    
+                    // Update user total coins
+                    if (gameState.user) {
+                        gameState.user.total_coins = gameState.coins;
+                        localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                        
+                        // Update user in users list if not anonymous
+                        if (!gameState.user.is_anonymous) {
+                            const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                            const userIndex = users.findIndex(u => u.id === gameState.user.id);
+                            if (userIndex !== -1) {
+                                users[userIndex].total_coins = gameState.user.total_coins;
+                                localStorage.setItem('pixel_jump_users', JSON.stringify(users));
+                            }
+                        }
+                    }
+                    
+                    playSound('coin');
+                }
+            }
+
+            // Check boundaries
+            if (player.x < 0) {
+                player.x = 0;
+                player.velocityX = 0;
+            } else if (player.x + player.width > CONFIG.CANVAS_WIDTH) {
+                player.x = CONFIG.CANVAS_WIDTH - player.width;
+                player.velocityX = 0;
+            }
+
+            // Update camera
+            if (player.y < camera.y + 200) {
+                camera.y = player.y - 200;
+                
+                // Add score for climbing higher
+                gameState.score += 1;
+            }
+
+            // Check if player fell - FIX: Cải thiện logic kiểm tra rơi
+            if (player.y > camera.y + CONFIG.CANVAS_HEIGHT + 200) { // FIX: Tăng tolerance
+                gameState.lives--;
+                if (gameState.lives <= 0) {
+                    gameOver();
+                } else {
+                    respawnPlayer();
+                }
+            }
+
+            // Generate new platforms as player climbs
+            if (platforms.length > 0 && platforms[platforms.length - 1].y > camera.y - 200) {
+                const platformWidth = Math.random() * 50 + 70; // 70-120px width
+                const x = Math.random() * (CONFIG.CANVAS_WIDTH - platformWidth);
+                const y = platforms[platforms.length - 1].y - CONFIG.PLATFORM_GAP;
+                
+                platforms.push({
+                    x,
+                    y,
+                    width: platformWidth,
+                    height: 20
+                });
+                
+                // Add coin with probability
+                if (Math.random() < CONFIG.COIN_CHANCE) {
+                    coins.push({
+                        x: x + platformWidth / 2 - 10,
+                        y: y - 30,
+                        collected: false
+                    });
+                }
+                
+                // Remove platforms that are too far below
+                if (platforms.length > 20) {
+                    platforms.shift();
+                }
+            }
+
+            // Update level and progress - FIX: Cải thiện logic level progression
+            const oldLevel = gameState.level;
+            const newLevel = Math.floor(gameState.score / CONFIG.LEVEL_SCORE_THRESHOLD) + 1;
+            
+            if (newLevel > oldLevel && !gameState.levelCompleted) {
+                gameState.level = newLevel;
+                gameState.levelCompleted = true;
+                levelComplete();
+            }
+
+            gameState.progress = (gameState.score % CONFIG.LEVEL_SCORE_THRESHOLD) / CONFIG.LEVEL_SCORE_THRESHOLD * 100;
+
+            updateUI();
+        }
+
+        function applyLevelEffects() {
+            switch (gameState.activeLevel.type) {
+                case 'fast':
+                    // Platforms move faster
+                    for (let platform of platforms) {
+                        platform.x += (Math.random() - 0.5) * 2;
+                    }
+                    break;
+                    
+                case 'coins':
+                    // More coins
+                    if (Math.random() < 0.01) {
+                        const x = Math.random() * (CONFIG.CANVAS_WIDTH - 20);
+                        const y = camera.y + Math.random() * 200;
+                        coins.push({
+                            x,
+                            y,
+                            collected: false
+                        });
+                    }
+                    break;
+                    
+                case 'ice':
+                    // Slippery platforms (less friction)
+                    player.velocityX *= 0.98; // Less friction
+                    break;
+                    
+                case 'wind':
+                    // Wind effect pushes player
+                    player.velocityX += (Math.random() - 0.5) * 0.5;
+                    break;
+                    
+                case 'gravity':
+                    // Altered gravity
+                    player.velocityY += CONFIG.GRAVITY * 0.5; // Less gravity
+                    break;
+                    
+                case 'boss':
+                    // Boss level - platforms move more erratically
+                    for (let platform of platforms) {
+                        platform.x += Math.sin(Date.now() / 1000 + platform.y) * 2;
+                        
+                        // Keep platforms in bounds
+                        if (platform.x < 0) platform.x = 0;
+                        if (platform.x + platform.width > CONFIG.CANVAS_WIDTH) {
+                            platform.x = CONFIG.CANVAS_WIDTH - platform.width;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
+
+            // Save context for camera
+            ctx.save();
+            ctx.translate(0, -camera.y);
+
+            // Draw platforms
+            platforms.forEach(platform => {
+                // Different colors for different level types
+                switch (gameState.activeLevel.type) {
+                    case 'normal':
+                        ctx.fillStyle = '#8B4513'; // Brown
+                        break;
+                    case 'fast':
+                        ctx.fillStyle = '#1E90FF'; // Blue
+                        break;
+                    case 'coins':
+                        ctx.fillStyle = '#FFD700'; // Gold
+                        break;
+                    case 'gap':
+                        ctx.fillStyle = '#FF8C00'; // Orange
+                        break;
+                    case 'boss':
+                        ctx.fillStyle = '#FF0000'; // Red
+                        break;
+                    case 'ice':
+                        ctx.fillStyle = '#00FFFF'; // Cyan
+                        break;
+                    case 'bounce':
+                        ctx.fillStyle = '#32CD32'; // Lime
+                        break;
+                    case 'wind':
+                        ctx.fillStyle = '#87CEEB'; // Sky Blue
+                        break;
+                    case 'gravity':
+                        ctx.fillStyle = '#808080'; // Gray
+                        break;
+                    case 'master':
+                        ctx.fillStyle = '#800080'; // Purple
+                        break;
+                    default:
+                        ctx.fillStyle = '#8B4513'; // Brown
+                }
+                
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            });
+
+            // Draw coins
+            ctx.fillStyle = '#FFD700';
+            coins.forEach(coin => {
+                if (!coin.collected) {
+                    ctx.beginPath();
+                    ctx.arc(coin.x + 10, coin.y + 10, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // Draw player
+            drawPlayer();
+
+            // Restore context
+            ctx.restore();
+        }
+
+        function drawPlayer() {
+            // Get character color
+            const character = gameState.characters.find(c => c.id === player.character);
+            const color = character ? character.color : '#FFD700';
+            
+            // Draw character body
+            ctx.fillStyle = color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // Add simple face
+            ctx.fillStyle = '#000';
+            ctx.fillRect(player.x + 8, player.y + 8, 4, 4);
+            ctx.fillRect(player.x + 18, player.y + 8, 4, 4);
+            ctx.fillRect(player.x + 10, player.y + 18, 10, 2);
+        }
+
+        function respawnPlayer() {
+            // FIX: Respawn player ở vị trí an toàn hơn
+            const safeY = camera.y + CONFIG.CANVAS_HEIGHT - 150;
+            
+            // Tìm platform gần nhất để respawn
+            let nearestPlatform = null;
+            let minDistance = Infinity;
+            
+            for (let platform of platforms) {
+                if (platform.y >= safeY - 50 && platform.y <= safeY + 50) {
+                    const distance = Math.abs(platform.x + platform.width/2 - CONFIG.CANVAS_WIDTH/2);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestPlatform = platform;
+                    }
+                }
+            }
+            
+            if (nearestPlatform) {
+                player.x = nearestPlatform.x + nearestPlatform.width/2 - player.width/2;
+                player.y = nearestPlatform.y - player.height;
+            } else {
+                player.x = CONFIG.CANVAS_WIDTH / 2;
+                player.y = safeY;
+            }
+            
+            player.velocityX = 0;
+            player.velocityY = 0;
+            player.onGround = true;
+            player.canDoubleJump = true;
+            
+            // Play respawn sound
+            playSound('respawn');
+            
+            // Vibrate if enabled
+            if (gameState.settings.vibration && navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+        }
+
+        function levelComplete() {
+            gameState.isPlaying = false;
+            
+            // Update stats
+            document.getElementById('levelCompleteStats').innerHTML = `
+                Điểm: ${gameState.score}<br>
+                Coins: ${gameState.coins}<br>
+                Level: ${gameState.level - 1} → ${gameState.level}
+            `;
+            
+            // Show level complete panel
+            document.getElementById('levelCompletePanel').style.display = 'block';
+            
+            // Hide game controls
+            document.getElementById('gameUI').style.display = 'none';
+            
+            // Play level complete sound
+            playSound('levelComplete');
+            
+            // Update high score
+            if (gameState.user && gameState.score > gameState.user.high_score) {
+                gameState.user.high_score = gameState.score;
+                localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                
+                // Update user in users list if not anonymous
+                if (!gameState.user.is_anonymous) {
+                    const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === gameState.user.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].high_score = gameState.user.high_score;
+                        localStorage.setItem('pixel_jump_users', JSON.stringify(users));
+                    }
+                }
+            }
+            
+            // Setup next level
+            setupLevel(gameState.level);
+        }
+
+        function gameOver() {
+            gameState.isPlaying = false;
+            
+            // Play game over sound
+            playSound('gameOver');
+            
+            // Vibrate if enabled
+            if (gameState.settings.vibration && navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+            
+            // Update high score
+            if (gameState.user && gameState.score > gameState.user.high_score) {
+                gameState.user.high_score = gameState.score;
+                localStorage.setItem('pixel_jump_user', JSON.stringify(gameState.user));
+                
+                // Update user in users list if not anonymous
+                if (!gameState.user.is_anonymous) {
+                    const users = JSON.parse(localStorage.getItem('pixel_jump_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === gameState.user.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].high_score = gameState.user.high_score;
+                        localStorage.setItem('pixel_jump_users', JSON.stringify(users));
+                    }
+                }
+            }
+            
+            // Hide game controls
+            document.getElementById('gameUI').style.display = 'none';
+            
+            showNotification(`Game Over! Điểm: ${gameState.score}`);
+            setTimeout(() => {
+                document.getElementById('menuOverlay').style.display = 'flex';
+            }, 2000);
+        }
+
+        // Input handling
+        function handleClick(e) {
+            if (!gameState.isPlaying) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+
+            handleInput(x, y);
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            if (!gameState.isPlaying) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const touch = e.touches[0];
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
+
+            handleInput(x, y);
+        }
+
+        function handleInput(x, y) {
+            const centerX = CONFIG.CANVAS_WIDTH / 2;
+            
+            if (x < centerX - 100) {
+                // Left side - move left and jump
+                player.velocityX = -CONFIG.HORIZONTAL_SPEED;
+                jump();
+            } else if (x > centerX + 100) {
+                // Right side - move right and jump
+                player.velocityX = CONFIG.HORIZONTAL_SPEED;
+                jump();
+            } else {
+                // Center - just jump
+                jump();
+            }
+        }
+
+        function moveLeft() {
+            if (!gameState.isPlaying) return;
+            player.velocityX = -CONFIG.HORIZONTAL_SPEED;
+        }
+
+        function moveRight() {
+            if (!gameState.isPlaying) return;
+            player.velocityX = CONFIG.HORIZONTAL_SPEED;
+        }
+
+        function jumpButton() {
+            if (!gameState.isPlaying) return;
+            jump();
+        }
+
+        function jump() {
+            if (player.onGround) {
+                player.velocityY = CONFIG.JUMP_FORCE;
+                player.onGround = false;
+                playSound('jump');
+            } else if (player.canDoubleJump) {
+                player.velocityY = CONFIG.DOUBLE_JUMP_FORCE;
+                player.canDoubleJump = false;
+                playSound('doubleJump');
+            }
+        }
+
+        // UI functions
+        function updateUI() {
+            document.getElementById('scoreDisplay').textContent = `Điểm: ${gameState.score}`;
+            document.getElementById('coinsDisplay').textContent = `💰 ${gameState.coins}`;
+            document.getElementById('livesDisplay').textContent = `❤️ ${gameState.lives}`;
+            document.getElementById('progressFill').style.width = `${gameState.progress}%`;
+        }
+
+        // Audio functions
+        function playSound(type) {
+            if (!gameState.settings.sound) return;
+            
+            // Create simple audio feedback using Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                const frequencies = {
+                    'jump': 440,
+                    'doubleJump': 660,
+                    'coin': 880,
+                    'levelUp': [523, 659, 784, 1047],
+                    'levelComplete': [523, 659, 784, 1047, 1318],
+                    'gameOver': [440, 392, 349, 330, 294],
+                    'start': [294, 330, 349, 392, 440, 494, 523],
+                    'purchase': [660, 880],
+                    'respawn': [440, 494, 523]
+                };
+
+                if (type === 'levelUp' || type === 'levelComplete' || type === 'gameOver' || type === 'start') {
+                    // Play melody
+                    frequencies[type].forEach((freq, i) => {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+                            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                            osc.start();
+                            osc.stop(audioContext.currentTime + 0.3);
+                        }, i * 100);
+                    });
+                } else if (type === 'purchase') {
+                    // Play purchase sound
+                    frequencies[type].forEach((freq, i) => {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+                            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                            osc.start();
+                            osc.stop(audioContext.currentTime + 0.2);
+                        }, i * 150);
+                    });
+                } else {
+                    // Play simple sound
+                    oscillator.frequency.setValueAtTime(frequencies[type] || 440, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                }
+            } catch (e) {
+                console.error('Error playing sound:', e);
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            // Check for saved user
+            const savedUser = localStorage.getItem('pixel_jump_user');
+            if (savedUser) {
+                try {
+                    gameState.user = JSON.parse(savedUser);
+                    updateAuthStatus();
+                    
+                    // Update coins
+                    gameState.coins = gameState.user.total_coins;
+                    updateUI();
+                    
+                    // Update character unlocks
+                    updateCharacterUnlocks();
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            } else {
+                // Create anonymous user
+                createAnonymousUser();
+            }
+        });
+    </script>
+</body>
 </html>
+
